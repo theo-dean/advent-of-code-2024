@@ -132,3 +132,6 @@ dist
 
 # AoC Puzzle Data
 *.txt
+
+# WebStorm
+.idea
