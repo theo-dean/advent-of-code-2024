@@ -29,14 +29,11 @@ function parseFileToArrays(filePath: string): { left: number[]; right: number[] 
     const right: number[] = [];
 
     const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const lines = fileContent.split('\n');
-
-    for (const line of lines) {
-            const [leftNum, rightNum] = line.split('   ').map(Number);
-            left.push(leftNum);
-            right.push(rightNum);
-    }
-
+    fileContent.split('\n').forEach((line) => {
+        const [leftNum, rightNum] = line.split('   ').map(Number);
+        left.push(leftNum);
+        right.push(rightNum);
+    });
     return { left, right };
 }
 
