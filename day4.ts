@@ -110,5 +110,5 @@ const part2 = (data) => {
     return crossSearch(data)
 }
 
-//console.log(part1(data));
+console.log(part1(data));
 console.log(part2(data));
