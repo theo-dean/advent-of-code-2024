@@ -1,4 +1,7 @@
-const sampleData = "47|53\n" +
+import * as fs from "node:fs";
+
+const sampleData =
+    "47|53\n" +
     "97|13\n" +
     "97|61\n" +
     "97|47\n" +
@@ -27,24 +30,37 @@ const sampleData = "47|53\n" +
     "61,13,29\n" +
     "97,13,75,29,47"
 
-const rawDataToRulesandUpdates = (rawData: string): {rules: Map<string, string[]>, updates: string[]} => {
+const data = fs.readFileSync("./data/day5.txt", "utf-8");
+
+const rawDataToRulesandUpdates = (rawData: string): {rules: Map<number, number[]>, updates: number[][]} => {
     const lines = rawData.split("\n");
-    const rules = new Map<string, string[]>();
-    lines.slice(0, lines.findIndex(s => s === "")).forEach(rs => {
-        const key = rs.split("|")[0];
-        const target = rs.split("|")[1];
-        if (rules.has(key)){
-            const curr = rules.get(key);
-            rules.set(key, curr.concat([target]));
-        } else {
-            rules.set(key, [target]);
-        }
+    const splitIndex = lines.findIndex(s => s === "");
+
+    const rules = new Map<number, number[]>();
+    lines.slice(0, splitIndex).forEach(rs => {
+        const [key, target] = rs.split("|").map(Number);
+        const curr = rules.get(key) ?? [];
+        rules.set(key, [...curr, target]);
     });
-    const updates = lines.slice(lines.findIndex(s => s === "")+1, lines.length);
+
+    const updates = lines.slice(splitIndex+1, lines.length).map(l => l.split(",").map(Number));
 
     return {
         rules, updates
     }
 };
 
-console.log(rawDataToRulesandUpdates(sampleData))
+const isValidUpdate = (update: number[], rules: Map<number, number[]>): boolean => {
+    for (let i = 1; i < update.length; i++) {
+        const rule = rules.get(update[i]);
+        if (rule && update.slice(0, i).some(v => rule.includes(v))) return false;
+    }
+    return true;
+}
+
+const part1 = (data: string): number => {
+    const {rules, updates} = rawDataToRulesandUpdates(data);
+    return updates.filter(u => isValidUpdate(u, rules)).map(u => u[Math.floor(u.length/2)]).reduce((a, b) => a + b);
+}
+
+console.log(part1(data));
