@@ -55,13 +55,24 @@ const rawDataToRulesandUpdates = (
   };
 };
 
+const shiftBack = (target: number, arr: number[]): number[] => {
+  const index = arr.indexOf(target);
+  const result = [...arr];
+  [result[index - 1], result[index]] = [result[index], result[index - 1]];
+  return result;
+};
+
+const isValidFloor = (update: number[], rules: number[]): boolean => {
+  return !(rules && update.some((v) => rules.includes(v)));
+};
+
 const isValidUpdate = (
   update: number[],
   rules: Map<number, number[]>,
 ): boolean => {
   for (let i = 1; i < update.length; i++) {
     const rule = rules.get(update[i]);
-    if (rule && update.slice(0, i).some((v) => rule.includes(v))) return false;
+    if (!isValidFloor(update.slice(0, i), rule)) return false;
   }
   return true;
 };
@@ -74,4 +85,18 @@ const part1 = (data: string): number => {
     .reduce((a, b) => a + b);
 };
 
+const part2 = (data: string): number => {
+  const { rules, updates } = rawDataToRulesandUpdates(data);
+  return updates
+    .filter((u) => !isValidUpdate(u, rules))
+    .map((u) =>
+      u.sort((a, b) =>
+        rules.get(a) && rules.get(a).find((n) => n === b) ? -1 : 0,
+      ),
+    )
+    .map((u) => u[Math.floor(u.length / 2)])
+    .reduce((a, b) => a + b);
+};
+
 console.log(part1(data));
+console.log(part2(data));
